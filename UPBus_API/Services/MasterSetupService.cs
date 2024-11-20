@@ -93,7 +93,7 @@ namespace UPBus_API.Services
 
                     Bus bus = _mapper.Map<Bus>(info);
                     bus.CreatedDate = GetLocalStdDT();
-                    info.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                    bus.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
                     _context.Bus.Add(bus);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
@@ -112,9 +112,6 @@ namespace UPBus_API.Services
 
             return msg;
         }
-
-
-
 
         public async Task<ResponseMessage> UpdateBus(BusDto info)
         {
@@ -136,7 +133,7 @@ namespace UPBus_API.Services
                     bus.Active = info.Active;
                     bus.Remark = info.Remark;
                     bus.UpdatedDate = GetLocalStdDT();
-                    bus.UpdatedUser = info.UpdatedUser;
+                    bus.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
 
                     await _context.SaveChangesAsync();
                     msg.Status = true;
@@ -270,7 +267,7 @@ namespace UPBus_API.Services
             var msg = new ResponseMessage { Status = false };
             try
             {
-                var gate = await _context.Gate.FirstOrDefaultAsync(t => t.GateCode == id);
+                Gate gate = await _context.Gate.FromSqlRaw("SELECT * FROM Gate WHERE GateCode=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
 
                 if (gate == null)
                 {
@@ -320,7 +317,7 @@ namespace UPBus_API.Services
 
                     ExpenseType data = _mapper.Map<ExpenseType>(info);
                     data.CreatedDate = GetLocalStdDT();
-                    data.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
+                    data.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
                     _context.ExpenseType.Add(data);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
@@ -376,7 +373,7 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                var expenseType = await _context.ExpenseType.FirstOrDefaultAsync(t => t.ExpCode == id);
+                ExpenseType expenseType = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
                 if (expenseType == null)
                 {
                     msg.Status = false;
@@ -426,7 +423,7 @@ namespace UPBus_API.Services
                 {
                     IncomeType type = _mapper.Map<IncomeType>(info);
                     type.CreatedDate = GetLocalStdDT();
-                    type.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
+                    type.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
                     _context.IncomeType.Add(type);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
@@ -478,7 +475,7 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                var incomeType = await _context.IncomeType.FirstOrDefaultAsync(t => t.IncCode == id);
+                IncomeType incomeType = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE IncCode=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
 
                 if (incomeType == null)
                 {
@@ -529,7 +526,7 @@ namespace UPBus_API.Services
                 {
                     TripType type = _mapper.Map<TripType>(info);
                     type.CreatedDate = GetLocalStdDT();
-                    type.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
+                    type.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
                     _context.TripType.Add(type);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
@@ -581,7 +578,7 @@ namespace UPBus_API.Services
             var msg = new ResponseMessage { Status = false };
             try
             {
-                var trip = await _context.TripType.FirstOrDefaultAsync(t => t.TripCode == id);
+                TripType trip = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE TripCode=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
 
                 if (trip == null)
                 {
@@ -605,7 +602,7 @@ namespace UPBus_API.Services
 
         #endregion
 
-        #region Daily Plan 11-Nov-2024
+        #region Daily Plan 20-Nov-2024
 
         public async Task<DailyPlanDto> GetDailyPlanId(string id)
         {
@@ -677,18 +674,8 @@ namespace UPBus_API.Services
 
             try
             {
-                //Log the incoming TripCode for debugging
 
-                Console.WriteLine($"Received TripCode: {info.TripCode}");
-
-                if (string.IsNullOrWhiteSpace(info.TripCode))
-                {
-                    msg.Status = false;
-                    msg.MessageContent = "Trip Code cannot be empty.";
-                    return msg;
-                }
-
-                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT Top 1 * FROM DailyPlan WHERE REPLACE(TripCode,'','')=REPLACE(@id,'','')", new SqlParameter("@id", info.TripCode)).SingleOrDefaultAsync();
+                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT Top 1 * FROM DailyPlan WHERE REPLACE(DailyPlanID,'','')=REPLACE(@id,'','')", new SqlParameter("@id", info.DailyPlanID)).SingleOrDefaultAsync();
 
                 if (dailyPlan != null)
                 {
@@ -721,7 +708,6 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                // Fetch the existing truck record by VehicleRegNo
                 DailyPlan dailyPlan = await _context.DailyPlan.SingleOrDefaultAsync(t => t.TripCode == info.TripCode && t.BusNo == info.BusNo);
 
                 if (dailyPlan == null)
@@ -742,7 +728,7 @@ namespace UPBus_API.Services
                     dailyPlan.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
                     await _context.SaveChangesAsync();
                     msg.MessageContent = "Successfully updated";
-                    msg.Status = true; // Set status to true for a successful operation
+                    msg.Status = true;
                     return msg;
                 }
             }
@@ -753,12 +739,13 @@ namespace UPBus_API.Services
             }
         }
 
-        public async Task<ResponseMessage> DeleteDailyPlan(int id)
+        public async Task<ResponseMessage> DeleteDailyPlan(string id)
         {
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan Where DailyPlanId=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
+                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE TripCode=@id", new SqlParameter("@id", id)).FirstOrDefaultAsync();
+
                 if (dailyPlan == null)
                 {
                     msg.Status = false;
