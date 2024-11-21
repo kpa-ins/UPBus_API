@@ -602,7 +602,7 @@ namespace UPBus_API.Services
 
         #endregion
 
-        #region Daily Plan 20-Nov-2024
+        #region Daily Plan 11-Nov-2024
 
         public async Task<DailyPlanDto> GetDailyPlanId(string id)
         {
@@ -708,7 +708,13 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                DailyPlan dailyPlan = await _context.DailyPlan.SingleOrDefaultAsync(t => t.TripCode == info.TripCode && t.BusNo == info.BusNo);
+                //DailyPlan dailyPlan = await _context.DailyPlan.SingleOrDefaultAsync(t => t.TripCode == info.TripCode && t.BusNo == info.BusNo);
+                string query = "SELECT * FROM DailyPlan WHERE TripCode = @TripCode AND BusNo = @BusNo";
+                var dailyPlan = await _context.DailyPlan
+                    .FromSqlRaw(query,
+                        new SqlParameter("@TripCode", info.TripCode),
+                        new SqlParameter("@BusNo", info.BusNo))
+                    .SingleOrDefaultAsync();
 
                 if (dailyPlan == null)
                 {
