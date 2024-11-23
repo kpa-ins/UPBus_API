@@ -602,7 +602,7 @@ namespace UPBus_API.Services
 
         #endregion
 
-        #region Daily Plan 11-Nov-2024
+        #region Daily Plan 23-Nov-2024
 
         public async Task<DailyPlanDto> GetDailyPlanId(string id)
         {
@@ -674,9 +674,16 @@ namespace UPBus_API.Services
 
             try
             {
+                // Fixing the parameter names and query logic
+                DailyPlan dailyPlan = await _context.DailyPlan
+                    .FromSqlRaw("SELECT Top 1 * FROM DailyPlan WHERE TripCode = @tripCode AND BusNo = @busNo AND TripDate = @tripDate AND TripTime = @tripTime",
+                        new SqlParameter("@tripCode", info.TripCode),
+                        new SqlParameter("@busNo", info.BusNo),
+                        new SqlParameter("@tripDate", info.TripDate),
+                        new SqlParameter("@tripTime", info.TripTime))
+                    .SingleOrDefaultAsync();
 
-                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT Top 1 * FROM DailyPlan WHERE REPLACE(DailyPlanID,'','')=REPLACE(@id,'','')", new SqlParameter("@id", info.DailyPlanID)).SingleOrDefaultAsync();
-
+                // Check if the data already exists (duplicate check)
                 if (dailyPlan != null)
                 {
                     msg.Status = false;
@@ -684,12 +691,14 @@ namespace UPBus_API.Services
                 }
                 else
                 {
+                    // Map DTO to Entity
                     DailyPlan data = _mapper.Map<DailyPlan>(info);
-                    data.CreatedDate = GetLocalStdDT();
-                    data.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
+                    data.CreatedDate = GetLocalStdDT(); // Assuming this method gets the correct local date
+                    data.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser"; // Get current user
 
+                    // Add new data to the context
                     _context.DailyPlan.Add(data);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(); // Save changes to database
 
                     msg.Status = true;
                     msg.MessageContent = "Daily plan added successfully.";
@@ -697,7 +706,7 @@ namespace UPBus_API.Services
             }
             catch (DbUpdateException e)
             {
-                msg.MessageContent += e.Message;
+                msg.MessageContent = "An error occurred while saving the data: " + e.Message;
             }
 
             return msg;
@@ -708,13 +717,7 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                //DailyPlan dailyPlan = await _context.DailyPlan.SingleOrDefaultAsync(t => t.TripCode == info.TripCode && t.BusNo == info.BusNo);
-                string query = "SELECT * FROM DailyPlan WHERE TripCode = @TripCode AND BusNo = @BusNo";
-                var dailyPlan = await _context.DailyPlan
-                    .FromSqlRaw(query,
-                        new SqlParameter("@TripCode", info.TripCode),
-                        new SqlParameter("@BusNo", info.BusNo))
-                    .SingleOrDefaultAsync();
+                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE REPLACE(DailyPlanID,' ','')=REPLACE(@id,' ','') ", new SqlParameter("@id", info.DailyPlanID)).SingleOrDefaultAsync();
 
                 if (dailyPlan == null)
                 {
@@ -745,12 +748,12 @@ namespace UPBus_API.Services
             }
         }
 
-        public async Task<ResponseMessage> DeleteDailyPlan(string id)
+        public async Task<ResponseMessage> DeleteDailyPlan(int id)
         {
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE TripCode=@id", new SqlParameter("@id", id)).FirstOrDefaultAsync();
+                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE DailyPlanID=@id", new SqlParameter("@id", id)).FirstOrDefaultAsync();
 
                 if (dailyPlan == null)
                 {

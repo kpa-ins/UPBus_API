@@ -184,7 +184,7 @@ namespace UPBus_API.Controllers
 
         #endregion
 
-        #region Daily Plan 20-Nov-2024
+        #region Daily Plan 23-Nov-2024
 
         [HttpGet]
         public async Task<IActionResult> GetDailyPlanList()
@@ -227,6 +227,7 @@ namespace UPBus_API.Controllers
             return Ok(new { DriverName = driverName });
         }
 
+
         [HttpPost]
         public async Task<IActionResult> SaveDailyPlan(DailyPlanDto info)
         {
@@ -249,7 +250,7 @@ namespace UPBus_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDailyPlan(string id)
+        public async Task<IActionResult> DeleteDailyPlan(int id)
         {
             var msg = await _service.DeleteDailyPlan(id);
             return Ok(msg);
