@@ -7,6 +7,7 @@ using UPBus_API.Services;
 
 namespace UPBus_API.Controllers
 {
+    
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class MasterSetupController(MasterSetupService service) : ControllerBase

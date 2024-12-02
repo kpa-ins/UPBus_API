@@ -2,10 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>f87763a9-b94f-4d33-b840-b983ad10ded6</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+	<AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+
   </PropertyGroup>
 
   <ItemGroup>

@@ -202,19 +202,28 @@ namespace UPBus_API.Services
                 if (data != null)
                 {
                     msg.Status = false;
-                    msg.MessageContent = "Gate No duplicate!";
+                    msg.MessageContent = "Gate Code duplicate!";
                 }
                 else
                 {
+                    Gate g = await _context.Gate.FromSqlRaw("SELECT * FROM Gate WHERE GateCode!=@code AND REPLACE(GateName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.GateCode), new SqlParameter("@name", info.GateName)).SingleOrDefaultAsync();
 
-                    Gate gate = _mapper.Map<Gate>(info);
-                    gate.CreatedDate = GetLocalStdDT();
-                    gate.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
-                    _context.Gate.Add(gate);
-                    await _context.SaveChangesAsync();
-                    msg.Status = true;
-                    msg.MessageContent = "Successfully created!";
+                    if ( g != null)
+                    {
+                        msg.Status = false;
+                        msg.MessageContent = "Name duplicate!";
+                    }
 
+                    else
+                    {
+                        Gate gate = _mapper.Map<Gate>(info);
+                        gate.CreatedDate = GetLocalStdDT();
+                        gate.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                        _context.Gate.Add(gate);
+                        await _context.SaveChangesAsync();
+                        msg.Status = true;
+                        msg.MessageContent = "Successfully created!";
+                    }
                 }
 
 
@@ -242,13 +251,25 @@ namespace UPBus_API.Services
                 else
                 {
 
-                    gate.GateName = info.GateName;
-                    gate.Active = info.Active;
-                    gate.UpdatedDate = GetLocalStdDT();
-                    gate.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
-                    await _context.SaveChangesAsync();
-                    msg.Status = true;
-                    msg.MessageContent = "Successfully updated!";
+                    Gate g = await _context.Gate.FromSqlRaw("SELECT * FROM Gate WHERE GateCode!=@code AND REPLACE(GateName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.GateCode), new SqlParameter("@name", info.GateName)).SingleOrDefaultAsync();
+
+                    if (g != null)
+                    {
+                        msg.Status = false;
+                        msg.MessageContent = "Name duplicate!";
+                    }
+                    else
+                    {
+
+                        gate.GateName = info.GateName;
+                        gate.Active = info.Active;
+                        gate.UpdatedDate = GetLocalStdDT();
+                        gate.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                        await _context.SaveChangesAsync();
+                        msg.Status = true;
+                        msg.MessageContent = "Successfully updated!";
+
+                    }
 
 
                 }
@@ -306,25 +327,35 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                ExpenseType expenseType = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode=@expCode", new SqlParameter("@expCode", info.ExpCode)).SingleOrDefaultAsync();
-                if (expenseType != null)
+                ExpenseType exp = await _context.ExpenseType.FromSqlRaw("SELECT Top 1 * FROM ExpenseType ORDER BY ExpCode DESC").SingleOrDefaultAsync();
+                if (exp != null)
                 {
-                    msg.Status = false;
-                    msg.MessageContent = "Expense No duplicate!";
+                    int num = Convert.ToInt32(exp.ExpCode.Substring(1).ToString());
+                    num++;
+                    info.ExpCode = "E" + num.ToString("d4");
                 }
                 else
                 {
+                    info.ExpCode = "E" + "0001";
+                }
 
+                ExpenseType expt = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode!=@code AND REPLACE(ExpName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.ExpCode), new SqlParameter("@name", info.ExpName)).SingleOrDefaultAsync();
+
+                if (expt != null)
+                {
+                    msg.Status = false;
+                    msg.MessageContent = "Name duplicate!";
+                }
+                else
+                {
                     ExpenseType data = _mapper.Map<ExpenseType>(info);
                     data.CreatedDate = GetLocalStdDT();
-                    data.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
+                    data.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
                     _context.ExpenseType.Add(data);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
                     msg.MessageContent = "Successfully created!";
-
                 }
-
 
             }
             catch (DbUpdateException e)
@@ -341,7 +372,7 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                ExpenseType expenseType = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE REPLACE(ExpName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@name", info.ExpName)).SingleOrDefaultAsync();
+                ExpenseType expenseType = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode=@code", new SqlParameter("@code", info.ExpCode)).SingleOrDefaultAsync();
                 if (expenseType == null)
                 {
                     msg.Status = false;
@@ -349,15 +380,26 @@ namespace UPBus_API.Services
                 }
                 else
                 {
-                    expenseType.ExpName = info.ExpName;
-                    expenseType.ExpType = info.ExpType;
-                    expenseType.Active = info.Active;
-                    expenseType.UpdatedDate = GetLocalStdDT();
-                    expenseType.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
-                    _context.ExpenseType.Update(expenseType);
-                    await _context.SaveChangesAsync();
-                    msg.Status = true;
-                    msg.MessageContent = "Successfully updated";
+                    ExpenseType expt = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode!=@code AND REPLACE(ExpName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.ExpCode), new SqlParameter("@name", info.ExpName)).SingleOrDefaultAsync();
+
+                    if (expt != null)
+                    {
+                        msg.Status = false;
+                        msg.MessageContent = "Name duplicate!";
+                    }
+                    else
+                    {
+                        expenseType.ExpName = info.ExpName;
+                        expenseType.ExpType = info.ExpType;
+                        expenseType.Active = info.Active;
+                        expenseType.UpdatedDate = GetLocalStdDT();
+                        expenseType.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                        _context.ExpenseType.Update(expenseType);
+                        await _context.SaveChangesAsync();
+                        msg.Status = true;
+                        msg.MessageContent = "Successfully updated";
+                    }
+                   
                 }
             }
             catch (DbUpdateException e)
@@ -413,8 +455,21 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                IncomeType incomeType = await _context.IncomeType.FromSqlRaw("SELECT Top 1 * FROM IncomeType WHERE REPLACE(IncName,'','')=REPLACE(@name,'','')", new SqlParameter("@name", info.IncName)).SingleOrDefaultAsync();
-                if (incomeType != null)
+                IncomeType inc = await _context.IncomeType.FromSqlRaw("SELECT Top 1 * FROM IncomeType ORDER BY IncCode DESC").SingleOrDefaultAsync();
+                if (inc != null)
+                {
+                    int num = Convert.ToInt32(inc.IncCode.Substring(1).ToString());
+                    num++;
+                    info.IncCode = "I" + num.ToString("d4");
+                }
+                else
+                {
+                    info.IncCode = "I" + "0001";
+                }
+
+                IncomeType income = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE IncCode!=@code AND REPLACE(IncName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.IncCode), new SqlParameter("@name", info.IncName)).SingleOrDefaultAsync();
+
+                if (income != null)
                 {
                     msg.Status = false;
                     msg.MessageContent = "Name duplicate!";
@@ -423,7 +478,7 @@ namespace UPBus_API.Services
                 {
                     IncomeType type = _mapper.Map<IncomeType>(info);
                     type.CreatedDate = GetLocalStdDT();
-                    type.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
+                    type.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
                     _context.IncomeType.Add(type);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
@@ -443,23 +498,34 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                IncomeType expenseType = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE REPLACE(IncName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@name", info.IncName)).SingleOrDefaultAsync();
-                if (expenseType == null)
+                IncomeType incomeType = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE IncCode=@code", new SqlParameter("@code", info.IncCode)).SingleOrDefaultAsync();
+                if (incomeType == null)
                 {
                     msg.Status = false;
                     msg.MessageContent = "Data Not Found";
                 }
                 else
                 {
-                    expenseType.IncName = info.IncName;
-                    expenseType.IncType = info.IncType;
-                    expenseType.Active = info.Active;
-                    expenseType.UpdatedDate = GetLocalStdDT();
-                    expenseType.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
-                    _context.IncomeType.Update(expenseType);
-                    await _context.SaveChangesAsync();
-                    msg.Status = true;
-                    msg.MessageContent = "Successfully updated";
+                    IncomeType inc = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE IncCode!=@code AND REPLACE(IncName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.IncCode), new SqlParameter("@name", info.IncName)).SingleOrDefaultAsync();
+
+                    if (inc != null)
+                    {
+                        msg.Status = false;
+                        msg.MessageContent = "Name duplicate!";
+                    }
+                    else
+                    {
+                        incomeType.IncName = info.IncName;
+                        incomeType.IncType = info.IncType;
+                        incomeType.Active = info.Active;
+                        incomeType.UpdatedDate = GetLocalStdDT();
+                        incomeType.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                        _context.IncomeType.Update(incomeType);
+                        await _context.SaveChangesAsync();
+                        msg.Status = true;
+                        msg.MessageContent = "Successfully updated";
+                    }
+                    
                 }
             }
             catch (DbUpdateException e)
@@ -516,8 +582,21 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                TripType tripType = await _context.TripType.FromSqlRaw("SELECT Top 1 * FROM TripType WHERE REPLACE(TripName,'','')=REPLACE(@name,'','')", new SqlParameter("@name", info.TripName)).SingleOrDefaultAsync();
-                if (tripType != null)
+                TripType data = await _context.TripType.FromSqlRaw("SELECT Top 1 * FROM TripType ORDER BY TripCode DESC").SingleOrDefaultAsync();
+                if (data != null)
+                {
+                    int num = Convert.ToInt32(data.TripCode.Substring(1).ToString());
+                    num++;
+                    info.TripCode = "T" + num.ToString("d2");
+                }
+                else
+                {
+                    info.TripCode = "T" + "01";
+                }
+
+                TripType trip = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE TripCode!=@code AND REPLACE(TripName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.TripCode), new SqlParameter("@name", info.TripName)).SingleOrDefaultAsync();
+
+                if (trip != null)
                 {
                     msg.Status = false;
                     msg.MessageContent = "Name duplicate!";
@@ -526,7 +605,7 @@ namespace UPBus_API.Services
                 {
                     TripType type = _mapper.Map<TripType>(info);
                     type.CreatedDate = GetLocalStdDT();
-                    type.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
+                    type.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
                     _context.TripType.Add(type);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
@@ -546,7 +625,7 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                TripType tripType = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE REPLACE(TripName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@name", info.TripName)).SingleOrDefaultAsync();
+                TripType tripType = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE TripCode=@code", new SqlParameter("@code", info.TripCode)).SingleOrDefaultAsync();
                 if (tripType == null)
                 {
                     msg.Status = false;
@@ -554,15 +633,26 @@ namespace UPBus_API.Services
                 }
                 else
                 {
-                    tripType.TripName = info.TripName;
-                    tripType.TrpType = info.TrpType;
-                    tripType.Active = info.Active;
-                    tripType.UpdatedDate = GetLocalStdDT();
-                    tripType.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
-                    _context.TripType.Update(tripType);
-                    await _context.SaveChangesAsync();
-                    msg.Status = true;
-                    msg.MessageContent = "Successfully updated";
+                    TripType trip = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE TripCode!=@code AND REPLACE(TripName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.TripCode), new SqlParameter("@name", info.TripName)).SingleOrDefaultAsync();
+
+                    if (trip != null)
+                    {
+                        msg.Status = false;
+                        msg.MessageContent = "Name duplicate!";
+                    }
+                    else
+                    {
+                        tripType.TripName = info.TripName;
+                        tripType.TrpType = info.TrpType;
+                        tripType.Active = info.Active;
+                        tripType.UpdatedDate = GetLocalStdDT();
+                        tripType.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                        _context.TripType.Update(tripType);
+                        await _context.SaveChangesAsync();
+                        msg.Status = true;
+                        msg.MessageContent = "Successfully updated";
+                    }
+                    
                 }
             }
             catch (DbUpdateException e)
