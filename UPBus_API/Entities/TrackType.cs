@@ -1,17 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace UPBus_API.Entities
 {
-    public class IncomeType
+    public class TrackType
     {
         [Key]
-        [Column(TypeName = "varchar(6)")]
-        public string IncCode { get; set; } = null!;
-        [Column(TypeName = "nvarchar(500)")]
-        public string? IncName { get; set; }
         [Column(TypeName = "varchar(15)")]
-        public string? IncType { get; set; }
+        public string TripCode { get; set; } = null!;
+      
+        [Column(TypeName = "varchar(4)")]
+        public string? TripType { get; set; }
         [Column(TypeName = "bit")]
         public bool? Active { get; set; }
         [Column(TypeName = "datetime")]

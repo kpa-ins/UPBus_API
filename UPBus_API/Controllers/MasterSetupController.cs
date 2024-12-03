@@ -7,7 +7,6 @@ using UPBus_API.Services;
 
 namespace UPBus_API.Controllers
 {
-    
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class MasterSetupController(MasterSetupService service) : ControllerBase
@@ -152,33 +151,33 @@ namespace UPBus_API.Controllers
 
         #endregion
 
-        #region Trip Type 11-Nov-2024
+        #region Track Type 11-Nov-2024
 
         [HttpGet]
-        public async Task<IActionResult> GetTripTypeList()
+        public async Task<IActionResult> GetTrackTypeList()
         {
-            DataTable dt = await _service.GetTripTypeList();
+            DataTable dt = await _service.GetTrackTypeList();
             return Ok(dt);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveTripType(TripTypeDto info)
+        public async Task<IActionResult> SaveTrackType(TrackTypeDto info)
         {
-            ResponseMessage msg = await _service.SaveTripType(info);
+            ResponseMessage msg = await _service.SaveTrackType(info);
             return Ok(msg);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateTripType(TripTypeDto info)
+        public async Task<IActionResult> UpdateTrackType(TrackTypeDto info)
         {
-            ResponseMessage msg = await _service.UpdateTripType(info);
+            ResponseMessage msg = await _service.UpdateTrackType(info);
             return Ok(msg);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTripType(string id)
+        public async Task<IActionResult> DeleteTrackType(string id)
         {
-            var msg = await _service.DeleteTripType(id);
+            var msg = await _service.DeleteTrackType(id);
             return Ok(msg);
         }
 

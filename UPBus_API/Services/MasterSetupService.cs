@@ -327,34 +327,67 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                ExpenseType exp = await _context.ExpenseType.FromSqlRaw("SELECT Top 1 * FROM ExpenseType ORDER BY ExpCode DESC").SingleOrDefaultAsync();
-                if (exp != null)
+                if (info.ExpType == "GATE")
                 {
-                    int num = Convert.ToInt32(exp.ExpCode.Substring(1).ToString());
-                    num++;
-                    info.ExpCode = "E" + num.ToString("d4");
+                    ExpenseType exp = await _context.ExpenseType.FromSqlRaw("SELECT Top 1 * FROM ExpenseType WHERE ExpCode Like 'EG%' ORDER BY ExpCode DESC").SingleOrDefaultAsync();
+                    if (exp != null)
+                    {
+                        int num = Convert.ToInt32(exp.ExpCode.Substring(2).ToString());
+                        num++;
+                        info.ExpCode = "EG" + num.ToString("d4");
+                    }
+                    else
+                    {
+                        info.ExpCode = "EG" + "0001";
+                    }
                 }
-                else
+                else if (info.ExpType == "BUS")
                 {
-                    info.ExpCode = "E" + "0001";
+                    ExpenseType exp = await _context.ExpenseType.FromSqlRaw("SELECT Top 1 * FROM ExpenseType WHERE ExpCode Like 'EB%' ORDER BY ExpCode DESC").SingleOrDefaultAsync();
+                    if (exp != null)
+                    {
+                        int num = Convert.ToInt32(exp.ExpCode.Substring(2).ToString());
+                        num++;
+                        info.ExpCode = "EB" + num.ToString("d4");
+                    }
+                    else
+                    {
+                        info.ExpCode = "EB" + "0001";
+                    }
                 }
 
-                ExpenseType expt = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode!=@code AND REPLACE(ExpName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.ExpCode), new SqlParameter("@name", info.ExpName)).SingleOrDefaultAsync();
+                else if (info.ExpType == "TRIP")
+                {
+                    ExpenseType exp = await _context.ExpenseType.FromSqlRaw("SELECT Top 1 * FROM ExpenseType WHERE ExpCode Like 'ET%' ORDER BY ExpCode DESC").SingleOrDefaultAsync();
+                    if (exp != null)
+                    {
+                        int num = Convert.ToInt32(exp.ExpCode.Substring(2).ToString());
+                        num++;
+                        info.ExpCode = "ET" + num.ToString("d4");
+                    }
+                    else
+                    {
+                        info.ExpCode = "ET" + "0001";
+                    }
+                }
 
-                if (expt != null)
+
+                ExpenseType expense = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode!=@code AND ExpType=@type AND REPLACE(ExpName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.ExpCode), new SqlParameter("@name", info.ExpName), new SqlParameter("@type", info.ExpType)).SingleOrDefaultAsync();
+
+                if (expense != null)
                 {
                     msg.Status = false;
                     msg.MessageContent = "Name duplicate!";
                 }
                 else
                 {
-                    ExpenseType data = _mapper.Map<ExpenseType>(info);
-                    data.CreatedDate = GetLocalStdDT();
-                    data.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
-                    _context.ExpenseType.Add(data);
+                    ExpenseType type = _mapper.Map<ExpenseType>(info);
+                    type.CreatedDate = GetLocalStdDT();
+                    type.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                    _context.ExpenseType.Add(type);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
-                    msg.MessageContent = "Successfully created!";
+                    msg.MessageContent = "Successfully added";
                 }
 
             }
@@ -380,7 +413,7 @@ namespace UPBus_API.Services
                 }
                 else
                 {
-                    ExpenseType expt = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode!=@code AND REPLACE(ExpName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.ExpCode), new SqlParameter("@name", info.ExpName)).SingleOrDefaultAsync();
+                    ExpenseType expt = await _context.ExpenseType.FromSqlRaw("SELECT * FROM ExpenseType WHERE ExpCode!=@code AND ExpType=@type AND REPLACE(ExpName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.ExpCode), new SqlParameter("@name", info.ExpName), new SqlParameter("@type", info.ExpType)).SingleOrDefaultAsync();
 
                     if (expt != null)
                     {
@@ -455,19 +488,52 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                IncomeType inc = await _context.IncomeType.FromSqlRaw("SELECT Top 1 * FROM IncomeType ORDER BY IncCode DESC").SingleOrDefaultAsync();
-                if (inc != null)
+                if(info.IncType == "GATE")
                 {
-                    int num = Convert.ToInt32(inc.IncCode.Substring(1).ToString());
-                    num++;
-                    info.IncCode = "I" + num.ToString("d4");
+                    IncomeType inc = await _context.IncomeType.FromSqlRaw("SELECT Top 1 * FROM IncomeType WHERE IncCode Like 'IG%' ORDER BY IncCode DESC").SingleOrDefaultAsync();
+                    if (inc != null)
+                    {
+                        int num = Convert.ToInt32(inc.IncCode.Substring(2).ToString());
+                        num++;
+                        info.IncCode = "IG" + num.ToString("d4");
+                    }
+                    else
+                    {
+                        info.IncCode = "IG" + "0001";
+                    }
                 }
-                else
+                else if (info.IncType == "BUS")
                 {
-                    info.IncCode = "I" + "0001";
+                    IncomeType inc = await _context.IncomeType.FromSqlRaw("SELECT Top 1 * FROM IncomeType WHERE IncCode Like 'IB%' ORDER BY IncCode DESC").SingleOrDefaultAsync();
+                    if (inc != null)
+                    {
+                        int num = Convert.ToInt32(inc.IncCode.Substring(2).ToString());
+                        num++;
+                        info.IncCode = "IB" + num.ToString("d4");
+                    }
+                    else
+                    {
+                        info.IncCode = "IB" + "0001";
+                    }
                 }
 
-                IncomeType income = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE IncCode!=@code AND REPLACE(IncName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.IncCode), new SqlParameter("@name", info.IncName)).SingleOrDefaultAsync();
+                else if (info.IncType == "TRIP")
+                {
+                    IncomeType inc = await _context.IncomeType.FromSqlRaw("SELECT Top 1 * FROM IncomeType WHERE IncCode Like 'IT%' ORDER BY IncCode DESC").SingleOrDefaultAsync();
+                    if (inc != null)
+                    {
+                        int num = Convert.ToInt32(inc.IncCode.Substring(2).ToString());
+                        num++;
+                        info.IncCode = "IT" + num.ToString("d4");
+                    }
+                    else
+                    {
+                        info.IncCode = "IT" + "0001";
+                    }
+                }
+
+
+                IncomeType income = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE IncCode!=@code AND IncType=@type AND REPLACE(IncName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.IncCode), new SqlParameter("@name", info.IncName), new SqlParameter("@type", info.IncType)).SingleOrDefaultAsync();
 
                 if (income != null)
                 {
@@ -506,7 +572,7 @@ namespace UPBus_API.Services
                 }
                 else
                 {
-                    IncomeType inc = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE IncCode!=@code AND REPLACE(IncName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.IncCode), new SqlParameter("@name", info.IncName)).SingleOrDefaultAsync();
+                    IncomeType inc = await _context.IncomeType.FromSqlRaw("SELECT * FROM IncomeType WHERE IncCode!=@code AND IncType=@type AND REPLACE(IncName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.IncCode), new SqlParameter("@name", info.IncName), new SqlParameter("@type", info.IncType)).SingleOrDefaultAsync();
 
                     if (inc != null)
                     {
@@ -515,8 +581,8 @@ namespace UPBus_API.Services
                     }
                     else
                     {
+
                         incomeType.IncName = info.IncName;
-                        incomeType.IncType = info.IncType;
                         incomeType.Active = info.Active;
                         incomeType.UpdatedDate = GetLocalStdDT();
                         incomeType.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
@@ -568,48 +634,37 @@ namespace UPBus_API.Services
 
         #endregion
 
-        #region Trip Type 11-Nov-2024
+        #region Track Type 11-Nov-2024
 
-        public async Task<DataTable> GetTripTypeList()
+        public async Task<DataTable> GetTrackTypeList()
         {
-            string sql = "SELECT * FROM TripType";
+            string sql = "SELECT * FROM TrackType";
             DataTable dt = await GetDataTableAsync(sql);
             return dt;
         }
 
-        public async Task<ResponseMessage> SaveTripType(TripTypeDto info)
+        public async Task<ResponseMessage> SaveTrackType(TrackTypeDto info)
         {
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                TripType data = await _context.TripType.FromSqlRaw("SELECT Top 1 * FROM TripType ORDER BY TripCode DESC").SingleOrDefaultAsync();
+                TrackType data = await _context.TrackType.FromSqlRaw("SELECT * FROM TrackType WHERE TripCode=@no", new SqlParameter("@no", info.TripCode)).SingleOrDefaultAsync();
                 if (data != null)
                 {
-                    int num = Convert.ToInt32(data.TripCode.Substring(1).ToString());
-                    num++;
-                    info.TripCode = "T" + num.ToString("d2");
-                }
-                else
-                {
-                    info.TripCode = "T" + "01";
-                }
-
-                TripType trip = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE TripCode!=@code AND REPLACE(TripName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.TripCode), new SqlParameter("@name", info.TripName)).SingleOrDefaultAsync();
-
-                if (trip != null)
-                {
                     msg.Status = false;
-                    msg.MessageContent = "Name duplicate!";
+                    msg.MessageContent = "Trip Code duplicate!";
                 }
                 else
                 {
-                    TripType type = _mapper.Map<TripType>(info);
-                    type.CreatedDate = GetLocalStdDT();
-                    type.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
-                    _context.TripType.Add(type);
+
+                    TrackType track = _mapper.Map<TrackType>(info);
+                    track.CreatedDate = GetLocalStdDT();
+                    track.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                    _context.TrackType.Add(track);
                     await _context.SaveChangesAsync();
                     msg.Status = true;
-                    msg.MessageContent = "Successfully added";
+                    msg.MessageContent = "Successfully created!";
+
                 }
             }
             catch (DbUpdateException e)
@@ -620,39 +675,29 @@ namespace UPBus_API.Services
             return msg;
         }
 
-        public async Task<ResponseMessage> UpdateTripType(TripTypeDto info)
+        public async Task<ResponseMessage> UpdateTrackType(TrackTypeDto info)
         {
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                TripType tripType = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE TripCode=@code", new SqlParameter("@code", info.TripCode)).SingleOrDefaultAsync();
-                if (tripType == null)
+                TrackType track = await _context.TrackType.FromSqlRaw("SELECT * FROM TrackType WHERE TripCode=@code", new SqlParameter("@code", info.TripCode)).SingleOrDefaultAsync();
+                if (track == null)
                 {
                     msg.Status = false;
-                    msg.MessageContent = "Data Not Found";
+                    msg.MessageContent = "Data not found!";
                 }
                 else
                 {
-                    TripType trip = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE TripCode!=@code AND REPLACE(TripName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.TripCode), new SqlParameter("@name", info.TripName)).SingleOrDefaultAsync();
 
-                    if (trip != null)
-                    {
-                        msg.Status = false;
-                        msg.MessageContent = "Name duplicate!";
-                    }
-                    else
-                    {
-                        tripType.TripName = info.TripName;
-                        tripType.TrpType = info.TrpType;
-                        tripType.Active = info.Active;
-                        tripType.UpdatedDate = GetLocalStdDT();
-                        tripType.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
-                        _context.TripType.Update(tripType);
-                        await _context.SaveChangesAsync();
-                        msg.Status = true;
-                        msg.MessageContent = "Successfully updated";
-                    }
-                    
+                    track.TripType = info.TripType;
+                    track.Active = info.Active;
+                    track.UpdatedDate = GetLocalStdDT();
+                    track.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+
+                    await _context.SaveChangesAsync();
+                    msg.Status = true;
+                    msg.MessageContent = "Successfully updated!";
+
                 }
             }
             catch (DbUpdateException e)
@@ -663,12 +708,12 @@ namespace UPBus_API.Services
             return msg;
         }
 
-        public async Task<ResponseMessage> DeleteTripType(string id)
+        public async Task<ResponseMessage> DeleteTrackType(string id)
         {
             var msg = new ResponseMessage { Status = false };
             try
             {
-                TripType trip = await _context.TripType.FromSqlRaw("SELECT * FROM TripType WHERE TripCode=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
+                TrackType trip = await _context.TrackType.FromSqlRaw("SELECT * FROM TrackType WHERE TripCode=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
 
                 if (trip == null)
                 {
@@ -676,7 +721,7 @@ namespace UPBus_API.Services
                     return msg;
                 }
 
-                _context.TripType.Remove(trip);
+                _context.TrackType.Remove(trip);
                 await _context.SaveChangesAsync();
 
                 msg.Status = true;
@@ -714,7 +759,7 @@ namespace UPBus_API.Services
 
         public async Task<string[]> GetOnlyTripCode()
         {
-            return await _context.TripType
+            return await _context.TrackType
                 .Where(t => t.Active == true)
                 .Select(t => t.TripCode)
                 .ToArrayAsync();

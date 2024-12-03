@@ -33,5 +33,8 @@ namespace UPBus_API
         public DbSet<ExpenseType> ExpenseType { get; set; }
         public DbSet<DailyPlan> DailyPlan { get; set; }
 
+        public DbSet<TrackType> TrackType { get; set; }
+
+
     }
 }

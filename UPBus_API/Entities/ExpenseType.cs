@@ -6,7 +6,7 @@ namespace UPBus_API.Entities
     public class ExpenseType
     {
         [Key]
-        [Column(TypeName = "varchar(5)")]
+        [Column(TypeName = "varchar(6)")]
         public string ExpCode { get; set; } = null!;
         [Column(TypeName = "nvarchar(500)")]
         public string? ExpName { get; set; }
