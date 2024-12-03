@@ -19,7 +19,6 @@ namespace UPBus_API
             CreateMap<ExpenseType, ExpenseTypeDto>().ReverseMap();
             CreateMap<IncomeType, IncomeTypeDto>().ReverseMap();
             CreateMap<TrackType, TrackTypeDto>().ReverseMap();
-            CreateMap<DailyPlan, DailyPlanDto>().ReverseMap();
 
         }
     }

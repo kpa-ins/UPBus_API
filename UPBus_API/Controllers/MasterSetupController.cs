@@ -184,79 +184,79 @@ namespace UPBus_API.Controllers
 
         #endregion
 
-        #region Daily Plan 23-Nov-2024
+        //#region Daily Plan 23-Nov-2024
 
-        [HttpGet]
-        public async Task<IActionResult> GetDailyPlanList()
-        {
-            DataTable dt = await _service.GetDailyPlanList();
-            return Ok(dt);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetDailyPlanList()
+        //{
+        //    DataTable dt = await _service.GetDailyPlanList();
+        //    return Ok(dt);
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> GetTripCodes()
-        {
-            var tripCodes = await _service.GetOnlyTripCode();
-            return Ok(tripCodes);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetTripCodes()
+        //{
+        //    var tripCodes = await _service.GetOnlyTripCode();
+        //    return Ok(tripCodes);
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> GetBusLists()
-        {
-            var busList = await _service.GetBusNoList();
-            if (busList == null || !busList.Any())
-            {
-                return NotFound(new { message = "No active buses found" });
-            }
-            return Ok(busList);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetBusLists()
+        //{
+        //    var busList = await _service.GetBusNoList();
+        //    if (busList == null || !busList.Any())
+        //    {
+        //        return NotFound(new { message = "No active buses found" });
+        //    }
+        //    return Ok(busList);
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> GetDriverByBusNo(string busNo)
-        {
-            if (string.IsNullOrEmpty(busNo))
-            {
-                return BadRequest(new { message = "Bus number is required" });
-            }
+        //[HttpGet]
+        //public async Task<IActionResult> GetDriverByBusNo(string busNo)
+        //{
+        //    if (string.IsNullOrEmpty(busNo))
+        //    {
+        //        return BadRequest(new { message = "Bus number is required" });
+        //    }
 
-            var driverName = await _service.GetDriverByBusNo(busNo);
-            if (string.IsNullOrEmpty(driverName))
-            {
-                return NotFound(new { message = $"No driver found for bus number {busNo}" });
-            }
-            return Ok(new { DriverName = driverName });
-        }
+        //    var driverName = await _service.GetDriverByBusNo(busNo);
+        //    if (string.IsNullOrEmpty(driverName))
+        //    {
+        //        return NotFound(new { message = $"No driver found for bus number {busNo}" });
+        //    }
+        //    return Ok(new { DriverName = driverName });
+        //}
 
 
-        [HttpPost]
-        public async Task<IActionResult> SaveDailyPlan(DailyPlanDto info)
-        {
-            ResponseMessage msg = await _service.SaveDailyPlan(info);
-            return Ok(msg);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> SaveDailyPlan(DailyPlanDto info)
+        //{
+        //    ResponseMessage msg = await _service.SaveDailyPlan(info);
+        //    return Ok(msg);
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> GetDailyPlanId(string id)
-        {
-            DailyPlanDto dailyPlanDto = await _service.GetDailyPlanId(id);
-            return Ok(dailyPlanDto);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetDailyPlanId(string id)
+        //{
+        //    DailyPlanDto dailyPlanDto = await _service.GetDailyPlanId(id);
+        //    return Ok(dailyPlanDto);
+        //}
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateDailyPlan(DailyPlanDto info)
-        {
-            ResponseMessage msg = await _service.UpdateDailyPlan(info);
-            return Ok(msg);
-        }
+        //[HttpPut]
+        //public async Task<IActionResult> UpdateDailyPlan(DailyPlanDto info)
+        //{
+        //    ResponseMessage msg = await _service.UpdateDailyPlan(info);
+        //    return Ok(msg);
+        //}
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDailyPlan(int id)
-        {
-            var msg = await _service.DeleteDailyPlan(id);
-            return Ok(msg);
-        }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteDailyPlan(int id)
+        //{
+        //    var msg = await _service.DeleteDailyPlan(id);
+        //    return Ok(msg);
+        //}
 
-        #endregion
+        //#endregion
 
     }
 }
