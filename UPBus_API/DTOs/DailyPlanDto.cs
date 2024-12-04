@@ -3,8 +3,8 @@ namespace UPBus_API.DTOs
 {
     public class DailyPlanDto
     {
-        public int DailyPlanID { get; set; }
-        public string? TripCode { get; set; }
+        public string RegNo { get; set; }
+        public string? TrackCode { get; set; }
         public DateTime? TripDate { get; set; }
         public string? TripTime { get; set; }
         public string? Track { get; set; }

@@ -34,8 +34,8 @@ namespace UPBus_API
         public DbSet<DailyGateExpense> DailyGateExpense { get; set; }
         public DbSet<DailyGateIncome> DailyGateIncome { get; set; }
         public DbSet<GasStation> GasStation { get; set; }
-        //public DbSet<DailyPlan> DailyPlan { get; set; }
 
+        public DbSet<DailyPlan> DailyPlan { get; set; }
 
     }
 }

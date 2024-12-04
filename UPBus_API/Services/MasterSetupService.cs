@@ -737,182 +737,310 @@ namespace UPBus_API.Services
 
         #endregion
 
-        //#region Daily Plan 23-Nov-2024
+        #region Daily Plan 23-Nov-2024
 
-        //public async Task<DailyPlanDto> GetDailyPlanId(string id)
-        //{
-        //    DailyPlanDto dailyPlanDto = new DailyPlanDto();
-        //    try
-        //    {
-        //        DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE DailyPlanId=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
-        //        if (dailyPlan != null)
-        //        {
-        //            dailyPlanDto = _mapper.Map<DailyPlanDto>(dailyPlan);
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine(e);
-        //    }
-        //    return dailyPlanDto;
-        //}
+        public async Task<DailyPlanDto> GetDailyPlanId(string id)
+        {
+            DailyPlanDto dailyPlanDto = new DailyPlanDto();
+            try
+            {
+                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE DailyPlanId=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
+                if (dailyPlan != null)
+                {
+                    dailyPlanDto = _mapper.Map<DailyPlanDto>(dailyPlan);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return dailyPlanDto;
+        }
 
-        //public async Task<string[]> GetOnlyTripCode()
-        //{
-        //    return await _context.TrackType
-        //        .Where(t => t.Active == true)
-        //        .Select(t => t.TripCode)
-        //        .ToArrayAsync();
+        public async Task<DataTable> GetTrackTypes()
+        {
+            string sql = @"SELECT * FROM  TrackType WHERE Active = 1";
+            DataTable dt = await GetDataTableAsync(sql);
+            return dt;
+        }
 
-        //}
+        public async Task<DataTable> GetBusData()
+        {
+            string sql = @"SELECT BusNo, DriverName FROM Bus WHERE Active = 1";
+            DataTable dt = await GetDataTableAsync(sql);
+            return dt;
+        }
 
-        //public async Task<List<BusDto>> GetBusNoList()
-        //{
-        //    string sql = @"SELECT BusNo, DriverName FROM Bus WHERE Active = 1";
-        //    DataTable dt = await GetDataTableAsync(sql);
-        //    var busList = new List<BusDto>();
 
-        //    foreach (DataRow row in dt.Rows)
-        //    {
-        //        busList.Add(new BusDto
-        //        {
-        //            BusNo = row["BusNo"].ToString(),
-        //            DriverName = row["DriverName"].ToString()
-        //        });
-        //    }
+        public async Task<string> GetDriverByBusNo(string busNo)
+        {
+            string sql = @"SELECT DriverName FROM Bus WHERE BusNo = @busNo";
+            DataTable dt = await GetDataTableAsync(sql, new SqlParameter("@busNo", busNo));
 
-        //    return busList;
-        //}
+            if (dt.Rows.Count > 0)
+            {
+                return dt.Rows[0]["DriverName"].ToString();
+            }
+            return null; // Return null if no driver found
+        }
 
-        //public async Task<string> GetDriverByBusNo(string busNo)
-        //{
-        //    string sql = @"SELECT DriverName FROM Bus WHERE BusNo = @busNo";
-        //    DataTable dt = await GetDataTableAsync(sql, new SqlParameter("@busNo", busNo));
+        public async Task<DataTable> GetDailyPlanList()
+        {
+            string sql = @"SELECT * from DailyPlan";
+            DataTable dt = await GetDataTableAsync(sql);
+            return dt;
+        }
 
-        //    if (dt.Rows.Count > 0)
-        //    {
-        //        return dt.Rows[0]["DriverName"].ToString();
-        //    }
-        //    return null; // Return null if no driver found
-        //}
+        public async Task<ResponseMessage> SaveDailyPlan(DailyPlanDto info)
+        {
+            ResponseMessage msg = new ResponseMessage { Status = false };
 
-        //public async Task<DataTable> GetDailyPlanList()
-        //{
-        //    string sql = @"SELECT * from DailyPlan";
-        //    DataTable dt = await GetDataTableAsync(sql);
-        //    return dt;
-        //}
+            try
+            {
+                string code = GetLocalStdDT().ToString("ddMMyy");
+                DailyPlan daily = await _context.DailyPlan.FromSqlRaw("SELECT Top 1 * FROM DailyPlan WHERE RegNo LIKE '" + code + "%' ORDER BY RegNo DESC").SingleOrDefaultAsync();
+                if (daily != null)
+                {
+                    int num = Convert.ToInt32(daily.RegNo[^2..]);
+                    num++;
+                    info.RegNo = code + num.ToString("D2");
+                }
+                else
+                {
+                    info.RegNo = code + "01";
+                }
 
-        //public async Task<ResponseMessage> SaveDailyPlan(DailyPlanDto info)
-        //{
-        //    ResponseMessage msg = new ResponseMessage { Status = false };
 
-        //    try
-        //    {
-        //        // Fixing the parameter names and query logic
-        //        DailyPlan dailyPlan = await _context.DailyPlan
-        //            .FromSqlRaw("SELECT Top 1 * FROM DailyPlan WHERE TripCode = @tripCode AND BusNo = @busNo AND TripDate = @tripDate AND TripTime = @tripTime",
-        //                new SqlParameter("@tripCode", info.TripCode),
-        //                new SqlParameter("@busNo", info.BusNo),
-        //                new SqlParameter("@tripDate", info.TripDate),
-        //                new SqlParameter("@tripTime", info.TripTime))
-        //            .SingleOrDefaultAsync();
+                //DailyPlan data = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE IncCode!=@code AND IncType=@type AND REPLACE(IncName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.IncCode), new SqlParameter("@name", info.IncName), new SqlParameter("@type", info.IncType)).SingleOrDefaultAsync();
 
-        //        // Check if the data already exists (duplicate check)
-        //        if (dailyPlan != null)
-        //        {
-        //            msg.Status = false;
-        //            msg.MessageContent = "Data is duplicate!";
-        //        }
-        //        else
-        //        {
-        //            // Map DTO to Entity
-        //            DailyPlan data = _mapper.Map<DailyPlan>(info);
-        //            data.CreatedDate = GetLocalStdDT(); // Assuming this method gets the correct local date
-        //            data.CreatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser"; // Get current user
+                //if (data != null)
+                //{
+                //    msg.Status = false;
+                //    msg.MessageContent = "Name duplicate!";
+                //}
+                //else
+                //{
+                    DailyPlan type = _mapper.Map<DailyPlan>(info);
+                    type.CreatedDate = GetLocalStdDT();
+                    type.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                    _context.DailyPlan.Add(type);
+                    await _context.SaveChangesAsync();
+                    msg.Status = true;
+                    msg.MessageContent = "Successfully added";
+                //}
+            }
+            catch (DbUpdateException e)
+            {
+                msg.MessageContent += e.Message;
+                return msg;
+            }
+            return msg;
+        }
 
-        //            // Add new data to the context
-        //            _context.DailyPlan.Add(data);
-        //            await _context.SaveChangesAsync(); // Save changes to database
+        public async Task<ResponseMessage> UpdateDailyPlan(DailyPlanDto info)
+        {
+            ResponseMessage msg = new ResponseMessage { Status = false };
+            try
+            {
+                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE REPLACE(DailyPlanID,' ','')=REPLACE(@id,' ','') ", new SqlParameter("@id", info.RegNo)).SingleOrDefaultAsync();
 
-        //            msg.Status = true;
-        //            msg.MessageContent = "Daily plan added successfully.";
-        //        }
-        //    }
-        //    catch (DbUpdateException e)
-        //    {
-        //        msg.MessageContent = "An error occurred while saving the data: " + e.Message;
-        //    }
+                if (dailyPlan == null)
+                {
+                    msg.Status = false;
+                    msg.MessageContent = "Data Not Found";
+                    return msg;
+                }
+                else
+                {
+                    dailyPlan.TrackCode = info.TrackCode;
+                    dailyPlan.TripDate = info.TripDate;
+                    dailyPlan.TripTime = info.TripTime;
+                    dailyPlan.Track = info.Track;
+                    dailyPlan.BusNo = info.BusNo;
+                    dailyPlan.DriverName = info.DriverName;
+                    dailyPlan.UpdatedDate = GetLocalStdDT();
+                    dailyPlan.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
+                    await _context.SaveChangesAsync();
+                    msg.MessageContent = "Successfully updated";
+                    msg.Status = true;
+                    return msg;
+                }
+            }
+            catch (DbUpdateException e)
+            {
+                msg.MessageContent += e.Message;
+                return msg;
+            }
+        }
 
-        //    return msg;
-        //}
+        public async Task<ResponseMessage> DeleteDailyPlan(int id)
+        {
+            ResponseMessage msg = new ResponseMessage { Status = false };
+            try
+            {
+                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE RegNo=@id", new SqlParameter("@id", id)).FirstOrDefaultAsync();
 
-        //public async Task<ResponseMessage> UpdateDailyPlan(DailyPlanDto info)
-        //{
-        //    ResponseMessage msg = new ResponseMessage { Status = false };
-        //    try
-        //    {
-        //        DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE REPLACE(DailyPlanID,' ','')=REPLACE(@id,' ','') ", new SqlParameter("@id", info.DailyPlanID)).SingleOrDefaultAsync();
+                if (dailyPlan == null)
+                {
+                    msg.Status = false;
+                    msg.MessageContent = "Data Not Found";
+                }
+                else
+                {
+                    _context.DailyPlan.Remove(dailyPlan);
+                    await _context.SaveChangesAsync();
+                    msg.Status = true;
+                    msg.MessageContent = "Successfully Removed";
+                    return msg;
+                }
+            }
+            catch (DbUpdateException e)
+            {
+                msg.MessageContent += e.Message;
+                return msg;
+            }
+            return msg;
+        }
 
-        //        if (dailyPlan == null)
-        //        {
-        //            msg.Status = false;
-        //            msg.MessageContent = "Data Not Found";
-        //            return msg;
-        //        }
-        //        else
-        //        {
-        //            dailyPlan.TripCode = info.TripCode;
-        //            dailyPlan.TripDate = info.TripDate;
-        //            dailyPlan.TripTime = info.TripTime;
-        //            dailyPlan.Track = info.Track;
-        //            dailyPlan.BusNo = info.BusNo;
-        //            dailyPlan.DriverName = info.DriverName;
-        //            dailyPlan.UpdatedDate = GetLocalStdDT();
-        //            dailyPlan.UpdatedUser = _httpContextAccessor.HttpContext?.User.Identity.Name ?? "UnknownUser";
-        //            await _context.SaveChangesAsync();
-        //            msg.MessageContent = "Successfully updated";
-        //            msg.Status = true;
-        //            return msg;
-        //        }
-        //    }
-        //    catch (DbUpdateException e)
-        //    {
-        //        msg.MessageContent += e.Message;
-        //        return msg;
-        //    }
-        //}
+        #endregion
 
-        //public async Task<ResponseMessage> DeleteDailyPlan(int id)
-        //{
-        //    ResponseMessage msg = new ResponseMessage { Status = false };
-        //    try
-        //    {
-        //        DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE DailyPlanID=@id", new SqlParameter("@id", id)).FirstOrDefaultAsync();
 
-        //        if (dailyPlan == null)
-        //        {
-        //            msg.Status = false;
-        //            msg.MessageContent = "Data Not Found";
-        //        }
-        //        else
-        //        {
-        //            _context.DailyPlan.Remove(dailyPlan);
-        //            await _context.SaveChangesAsync();
-        //            msg.Status = true;
-        //            msg.MessageContent = "Successfully Removed";
-        //            return msg;
-        //        }
-        //    }
-        //    catch (DbUpdateException e)
-        //    {
-        //        msg.MessageContent += e.Message;
-        //        return msg;
-        //    }
-        //    return msg;
-        //}
 
-        //#endregion
+        #region Gas Station 4_Dec_2024
+
+        public async Task<DataTable> GetGasStationList()
+        {
+            string sql = "SELECT * FROM GasStation";
+            DataTable dt = await GetDataTableAsync(sql);
+            return dt;
+        }
+
+        public async Task<ResponseMessage> CreateGasStation(GasStationDto info)
+        {
+            ResponseMessage msg = new ResponseMessage { Status = false };
+            try
+            {
+                GasStation station = await _context.GasStation.FromSqlRaw("SELECT Top 1 * FROM GasStation  ORDER BY GSCode DESC").SingleOrDefaultAsync();
+                if (station != null)
+                {
+                    int num = Convert.ToInt32(station.GSCode.Substring(1).ToString());
+                    num++;
+                    info.GSCode = "G" + num.ToString("d2");
+                }
+                else
+                {
+                    info.GSCode = "G" + "01";
+                }
+
+                GasStation gs = await _context.GasStation.FromSqlRaw("SELECT * FROM GasStation WHERE GSCode!=@code AND REPLACE(GSName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.GSCode), new SqlParameter("@name", info.GSName)).SingleOrDefaultAsync();
+
+                if (gs != null)
+                {
+                    msg.Status = false;
+                    msg.MessageContent = "Name duplicate!";
+                }
+
+                else
+                {
+                    GasStation gstation = _mapper.Map<GasStation>(info);
+                    gstation.CreatedDate = GetLocalStdDT();
+                    gstation.CreatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                    _context.GasStation.Add(gstation);
+                    await _context.SaveChangesAsync();
+                    msg.Status = true;
+                    msg.MessageContent = "Successfully created!";
+                }
+                
+            }
+            catch (DbUpdateException e)
+            {
+                msg.MessageContent += e.Message;
+                return msg;
+            }
+
+            return msg;
+        }
+
+        public async Task<ResponseMessage> UpdateGasStation(GasStationDto info)
+        {
+            ResponseMessage msg = new ResponseMessage { Status = false };
+            try
+            {
+                GasStation station = await _context.GasStation.FromSqlRaw("SELECT * FROM GasStation WHERE GSCode=@code", new SqlParameter("@code", info.GSCode)).SingleOrDefaultAsync();
+                if (station == null)
+                {
+                    msg.Status = false;
+                    msg.MessageContent = "Data not found!";
+                }
+                else
+                {
+
+                    GasStation gs = await _context.GasStation.FromSqlRaw("SELECT * FROM GasStation WHERE GSCode!=@code AND REPLACE(GSName,' ','')=REPLACE(@name,' ','') ", new SqlParameter("@code", info.GSCode), new SqlParameter("@name", info.GSName)).SingleOrDefaultAsync();
+
+                    if (gs != null)
+                    {
+                        msg.Status = false;
+                        msg.MessageContent = "Name duplicate!";
+                    }
+                    else
+                    {
+
+                        station.GSName = info.GSName;
+                        station.Location = info.Location;
+                        station.TotalBalance = info.TotalBalance;
+                        station.Unit = info.Unit;
+                        station.Active = info.Active;
+                        station.UpdatedDate = GetLocalStdDT();
+                        station.UpdatedUser = _httpContextAccessor.HttpContext.User.Identity.Name;
+                        await _context.SaveChangesAsync();
+                        msg.Status = true;
+                        msg.MessageContent = "Successfully updated!";
+
+                    }
+
+
+                }
+            }
+            catch (DbUpdateException e)
+            {
+                msg.MessageContent += e.Message;
+                return msg;
+            }
+
+            return msg;
+        }
+
+        public async Task<ResponseMessage> DeleteGasStation(string id)
+        {
+            var msg = new ResponseMessage { Status = false };
+            try
+            {
+                GasStation station = await _context.GasStation.FromSqlRaw("SELECT * FROM GasStation WHERE GSCode=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
+
+                if (station == null)
+                {
+                    msg.MessageContent = "Data not found.";
+                    return msg;
+                }
+
+                _context.GasStation.Remove(station);
+                await _context.SaveChangesAsync();
+
+                msg.Status = true;
+                msg.MessageContent = "Removed successfully.";
+            }
+
+            catch (DbUpdateException e)
+            {
+                msg.MessageContent += e.Message;
+                return msg;
+            }
+
+            return msg;
+        }
+
+        #endregion
+
 
     }
 }
