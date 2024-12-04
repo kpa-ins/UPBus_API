@@ -856,6 +856,7 @@ namespace UPBus_API.Services
                     dailyPlan.TripDate = info.TripDate;
                     dailyPlan.TripTime = info.TripTime;
                     dailyPlan.Track = info.Track;
+                    dailyPlan.TrackType = info.TrackType;
                     dailyPlan.BusNo = info.BusNo;
                     dailyPlan.DriverName = info.DriverName;
                     dailyPlan.UpdatedDate = GetLocalStdDT();
