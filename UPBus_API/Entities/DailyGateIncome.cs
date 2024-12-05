@@ -16,6 +16,10 @@ namespace UPBus_API.Entities
         public string? PaidType { get; set; }
         [Column(TypeName = "float")]
         public float? Amount { get; set; }
+        [Column(TypeName = "varchar(4)")]
+        public string? GateCode { get; set; }
+        [Column(TypeName = "nvarchar(500)")]
+        public string? Description { get; set; }
         [Column(TypeName = "nvarchar(500)")]
         public string? Remark { get; set; }
 

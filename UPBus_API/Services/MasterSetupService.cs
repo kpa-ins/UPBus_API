@@ -193,6 +193,13 @@ namespace UPBus_API.Services
             return dt;
         }
 
+        public async Task<DataTable> GetActiveGate()
+        {
+            string sql = "SELECT GateCode, GateName FROM Gate WHERE Active=1";
+            DataTable dt = await GetDataTableAsync(sql);
+            return dt;
+        }
+
         public async Task<ResponseMessage> CreateGate(GateDto info)
         {
             ResponseMessage msg = new ResponseMessage { Status = false };
@@ -314,10 +321,20 @@ namespace UPBus_API.Services
 
         #region Expense Type 11-Nov-2024
 
-        public async Task<DataTable> GetExpenseTypeList()
+        public async Task<DataTable> GetExpenseTypeList(string expenseType)
         {
 
             string sql = "SELECT * FROM ExpenseType";
+            sql += expenseType == "All" ? " " : " WHERE ExpType=@type";
+            DataTable dt = await GetDataTableAsync(sql, new SqlParameter("@type", expenseType));
+            return dt;
+
+        }
+
+        public async Task<DataTable> GetActiveExpenseType()
+        {
+
+            string sql = "SELECT ExpCode, ExpName, (ExpCode + ' | '+ ExpName) as ExpenseName FROM ExpenseType WHERE Active=1";
             DataTable dt = await GetDataTableAsync(sql);
             return dt;
         }
@@ -476,9 +493,21 @@ namespace UPBus_API.Services
 
         #region Income Type 11-Nov-2024
 
-        public async Task<DataTable> GetIncomeTypeList()
+        public async Task<DataTable> GetIncomeTypeList(string incomeType)
         {
+
             string sql = "SELECT * FROM IncomeType";
+            sql += incomeType == "All" ? " " : " WHERE IncType=@type";
+            DataTable dt = await GetDataTableAsync(sql, new SqlParameter("@type", incomeType));
+            return dt;
+
+           
+        }
+
+        public async Task<DataTable> GetActiveIncomeType()
+        {
+
+            string sql = "SELECT IncCode, IncName, (IncCode + ' | '+ IncName) as IncomeName FROM IncomeType WHERE Active=1";
             DataTable dt = await GetDataTableAsync(sql);
             return dt;
         }
@@ -842,7 +871,7 @@ namespace UPBus_API.Services
             ResponseMessage msg = new ResponseMessage { Status = false };
             try
             {
-                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE REPLACE(DailyPlanID,' ','')=REPLACE(@id,' ','') ", new SqlParameter("@id", info.RegNo)).SingleOrDefaultAsync();
+                DailyPlan dailyPlan = await _context.DailyPlan.FromSqlRaw("SELECT * FROM DailyPlan WHERE REPLACE(RegNo,' ','')=REPLACE(@id,' ','') ", new SqlParameter("@id", info.RegNo)).SingleOrDefaultAsync();
 
                 if (dailyPlan == null)
                 {

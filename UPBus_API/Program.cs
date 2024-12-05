@@ -64,6 +64,7 @@ builder.Services.AddScoped<JwtHandler>();
 builder.Services.AddScoped<AccountService>();
 
 builder.Services.AddScoped<MasterSetupService>();
+builder.Services.AddScoped<DailyAccService>();
 
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

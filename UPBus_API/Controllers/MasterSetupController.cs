@@ -62,6 +62,13 @@ namespace UPBus_API.Controllers
             return Ok(dt);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetActiveGate()
+        {
+            DataTable dt = await _service.GetActiveGate();
+            return Ok(dt);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateGate(GateDto info)
         {
@@ -88,9 +95,17 @@ namespace UPBus_API.Controllers
         #region Expense Type 11-Nov-2024
 
         [HttpGet]
-        public async Task<IActionResult> GetExpenseTypeList()
+        public async Task<IActionResult> GetExpenseTypeList(string expenseType)
         {
-            DataTable dt = await _service.GetExpenseTypeList();
+            DataTable dt = await _service.GetExpenseTypeList(expenseType);
+            return Ok(dt);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetActiveExpenseType()
+        {
+            DataTable dt = await _service.GetActiveExpenseType();
             return Ok(dt);
         }
 
@@ -121,12 +136,18 @@ namespace UPBus_API.Controllers
         #region Income Type 11-Nov-2024
 
         [HttpGet]
-        public async Task<IActionResult> GetIncomeTypeList()
+        public async Task<IActionResult> GetIncomeTypeList(string incomeType)
         {
-            DataTable dt = await _service.GetIncomeTypeList();
+            DataTable dt = await _service.GetIncomeTypeList(incomeType);
             return Ok(dt);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetActiveIncomeType()
+        {
+            DataTable dt = await _service.GetActiveIncomeType();
+            return Ok(dt);
+        }
         [HttpPost]
         public async Task<IActionResult> SaveIncomeType(IncomeTypeDto info)
         {
