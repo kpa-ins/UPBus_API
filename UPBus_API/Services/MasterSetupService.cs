@@ -331,11 +331,11 @@ namespace UPBus_API.Services
 
         }
 
-        public async Task<DataTable> GetActiveExpenseType()
+        public async Task<DataTable> GetActiveExpenseType(string type)
         {
 
-            string sql = "SELECT ExpCode, ExpName, (ExpCode + ' | '+ ExpName) as ExpenseName FROM ExpenseType WHERE Active=1";
-            DataTable dt = await GetDataTableAsync(sql);
+            string sql = "SELECT ExpCode, ExpName, (ExpCode + ' | '+ ExpName) as ExpenseName FROM ExpenseType WHERE ExpType=@type AND Active=1";
+            DataTable dt = await GetDataTableAsync(sql, new SqlParameter("@type", type));
             return dt;
         }
 
@@ -504,11 +504,11 @@ namespace UPBus_API.Services
            
         }
 
-        public async Task<DataTable> GetActiveIncomeType()
+        public async Task<DataTable> GetActiveIncomeType(string type)
         {
 
-            string sql = "SELECT IncCode, IncName, (IncCode + ' | '+ IncName) as IncomeName FROM IncomeType WHERE Active=1";
-            DataTable dt = await GetDataTableAsync(sql);
+            string sql = "SELECT IncCode, IncName, (IncCode + ' | '+ IncName) as IncomeName FROM IncomeType WHERE IncType=@type AND Active=1";
+            DataTable dt = await GetDataTableAsync(sql, new SqlParameter("@type", type));
             return dt;
         }
 

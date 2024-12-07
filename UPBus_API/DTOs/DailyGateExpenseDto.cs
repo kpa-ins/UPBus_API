@@ -13,6 +13,9 @@ namespace UPBus_API.DTOs
 
         public string? GateCode { get; set; }
 
+        public string? GateAccCode { get; set; }
+        public string? AccDate { get; set; }
+
         public DateTime? CreatedDate { get; set; }
         public string? CreatedUser { get; set; }
         public DateTime? UpdatedDate { get; set; }

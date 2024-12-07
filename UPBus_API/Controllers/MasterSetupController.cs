@@ -103,9 +103,9 @@ namespace UPBus_API.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetActiveExpenseType()
+        public async Task<IActionResult> GetActiveExpenseType(string type)
         {
-            DataTable dt = await _service.GetActiveExpenseType();
+            DataTable dt = await _service.GetActiveExpenseType(type);
             return Ok(dt);
         }
 
@@ -143,9 +143,9 @@ namespace UPBus_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetActiveIncomeType()
+        public async Task<IActionResult> GetActiveIncomeType(string type)
         {
-            DataTable dt = await _service.GetActiveIncomeType();
+            DataTable dt = await _service.GetActiveIncomeType(type);
             return Ok(dt);
         }
         [HttpPost]
@@ -274,7 +274,6 @@ namespace UPBus_API.Controllers
         }
 
         #endregion
-
 
         #region Gas Station 4-Dec-2024
 

@@ -36,10 +36,10 @@ namespace UPBus_API.Controllers
             return Ok(msg);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDailyGateExpense(string id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDailyGateExpense(string id, string date)
         {
-            ResponseMessage msg = await _service.DeleteDailyGateExpense(id);
+            ResponseMessage msg = await _service.DeleteDailyGateExpense(id, date);
             return Ok(msg);
         }
 
@@ -47,7 +47,7 @@ namespace UPBus_API.Controllers
 
 
 
-        #region Daily Gate Expense 5-Dec-2024
+        #region Daily Gate Income 5-Dec-2024
 
         [HttpGet]
         public async Task<IActionResult> GetDailyGateIncomeList()
@@ -70,10 +70,53 @@ namespace UPBus_API.Controllers
             return Ok(msg);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDailyGateIncome(string id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDailyGateIncome(string id, string date)
         {
-            ResponseMessage msg = await _service.DeleteDailyGateIncome(id);
+            ResponseMessage msg = await _service.DeleteDailyGateIncome(id, date);
+            return Ok(msg);
+        }
+
+        #endregion
+
+
+
+        #region Daily Gate Acc 6-Dec-2024
+
+        [HttpGet]
+        public async Task<IActionResult> GetDailyGateAccList()
+        {
+            DataTable dt = await _service.GetDailyGateAccList();
+            return Ok(dt);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDailyGateAccById(string gate, string date)
+        {
+            DataTable dt = await _service.GetDailyGateAccById(gate, date);
+            return Ok(dt);
+        }
+
+        
+
+        [HttpPost]
+        public async Task<IActionResult> CreateDailyGateAcc(DailyGateAccDto info)
+        {
+            ResponseMessage msg = await _service.CreateDailyGateAcc(info);
+            return Ok(msg);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateDailyGateAcc(DailyGateAccDto info)
+        {
+            ResponseMessage msg = await _service.UpdateDailyGateAcc(info);
+            return Ok(msg);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDailyGateAcc(string gate, DateTime date)
+        {
+            ResponseMessage msg = await _service.DeleteDailyGateAcc(gate, date);
             return Ok(msg);
         }
 

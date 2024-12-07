@@ -25,17 +25,27 @@ namespace UPBus_API
             }
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<DailyGateAcc>().HasKey(i => new { i.GateCode, i.AccDate });
+           
+
+        }
+
+
 
         public DbSet<Bus> Bus { get; set; }
         public DbSet<Gate> Gate { get; set; }
         public DbSet<IncomeType> IncomeType { get; set; }
         public DbSet<ExpenseType> ExpenseType { get; set; }
         public DbSet<TrackType> TrackType { get; set; }
+        public DbSet<GasStation> GasStation { get; set; }
         public DbSet<DailyGateExpense> DailyGateExpense { get; set; }
         public DbSet<DailyGateIncome> DailyGateIncome { get; set; }
-        public DbSet<GasStation> GasStation { get; set; }
-
         public DbSet<DailyPlan> DailyPlan { get; set; }
+        public DbSet<DailyGateAcc> DailyGateAcc { get; set; }
 
     }
 }
