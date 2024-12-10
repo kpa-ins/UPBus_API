@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UPBus_API;
 
@@ -11,9 +12,11 @@ using UPBus_API;
 namespace UPBus_API.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241209040343_addStockTB")]
+    partial class addStockTB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,49 +258,6 @@ namespace UPBus_API.Migrations
                     b.HasKey("BusNo");
 
                     b.ToTable("Bus");
-                });
-
-            modelBuilder.Entity("UPBus_API.Entities.BusExpense", b =>
-                {
-                    b.Property<string>("ExpNo")
-                        .HasColumnType("varchar(15)");
-
-                    b.Property<string>("BusNo")
-                        .HasColumnType("varchar(7)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("CreatedUser")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("ExpCode")
-                        .HasColumnType("varchar(6)");
-
-                    b.Property<DateTime?>("ExpDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<double?>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("Qty")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Remark")
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<double?>("TotalAmt")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("UpdatedUser")
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("ExpNo");
-
-                    b.ToTable("BusExpense");
                 });
 
             modelBuilder.Entity("UPBus_API.Entities.DailyGateAcc", b =>
@@ -609,9 +569,6 @@ namespace UPBus_API.Migrations
 
                     b.Property<string>("CreatedUser")
                         .HasColumnType("varchar(50)");
-
-                    b.Property<bool?>("IsCancel")
-                        .HasColumnType("bit");
 
                     b.Property<double?>("LastPrice")
                         .HasColumnType("float");

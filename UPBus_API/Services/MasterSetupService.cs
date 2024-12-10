@@ -165,11 +165,21 @@ namespace UPBus_API.Services
                 }
                 else
                 {
-                    _context.Bus.Remove(bus);
+                    DailyPlan daily = await _context.DailyPlan.FromSqlRaw("SELECT TOP 1 * FROM DailyPlan WHERE BusNo=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
+                    if (daily != null)
+                    {
+                        msg.MessageContent = "Bus No already exists in another table!";
+                        return msg;
+                    }
+                    else
+                    {
+                        _context.Bus.Remove(bus);
 
-                    await _context.SaveChangesAsync();
-                    msg.Status = true;
-                    msg.MessageContent = "Successfully Deleted!";
+                        await _context.SaveChangesAsync();
+                        msg.Status = true;
+                        msg.MessageContent = "Successfully Deleted!";
+                    }
+                    
                 }
             }
             catch (DbUpdateException e)
@@ -303,11 +313,23 @@ namespace UPBus_API.Services
                     return msg;
                 }
 
-                _context.Gate.Remove(gate);
-                await _context.SaveChangesAsync();
+                DailyGateIncome income = await _context.DailyGateIncome.FromSqlRaw("SELECT TOP 1 * FROM DailyGateIncome WHERE GateCode=@id", new SqlParameter("@id", id)).SingleOrDefaultAsync();
+                if (income != null)
+                {
+                    msg.MessageContent = "Gate code already exists in another table!";
+                    return msg;
+                }
+                else
+                {
+                    _context.Gate.Remove(gate);
+                    await _context.SaveChangesAsync();
 
-                msg.Status = true;
-                msg.MessageContent = "Removed successfully.";
+                    msg.Status = true;
+                    msg.MessageContent = "Removed successfully.";
+                }
+
+
+               
             }
             catch (DbUpdateException e)
             {
@@ -473,11 +495,21 @@ namespace UPBus_API.Services
                 }
                 else
                 {
-                    _context.ExpenseType.Remove(expenseType);
+                    DailyGateExpense dailyGateExpense = await _context.DailyGateExpense.FromSqlRaw("SELECT TOP 1 * FROM DailyGateExpense WHERE ExpCode=@id", new SqlParameter("@id", expenseType.ExpCode)).SingleOrDefaultAsync();
+                    if(dailyGateExpense != null)
+                    {
+                        msg.MessageContent = "Expense already exists in another table!";
+                        return msg;
+                    }      
+                    else
+                    {
+                        _context.ExpenseType.Remove(expenseType);
 
-                    await _context.SaveChangesAsync();
-                    msg.Status = true;
-                    msg.MessageContent = "Successfully Deleted!";
+                        await _context.SaveChangesAsync();
+                        msg.Status = true;
+                        msg.MessageContent = "Successfully Deleted!";
+                    }
+                    
                 }
             }
             catch (DbUpdateException e)
@@ -903,7 +935,7 @@ namespace UPBus_API.Services
             }
         }
 
-        public async Task<ResponseMessage> DeleteDailyPlan(int id)
+        public async Task<ResponseMessage> DeleteDailyPlan(string id)
         {
             ResponseMessage msg = new ResponseMessage { Status = false };
             try

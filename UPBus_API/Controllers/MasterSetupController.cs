@@ -267,7 +267,7 @@ namespace UPBus_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteDailyPlan(int id)
+        public async Task<IActionResult> DeleteDailyPlan(string id)
         {
             var msg = await _service.DeleteDailyPlan(id);
             return Ok(msg);

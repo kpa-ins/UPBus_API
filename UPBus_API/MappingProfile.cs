@@ -26,6 +26,10 @@ namespace UPBus_API
             CreateMap<DailyGateExpense, DailyGateExpenseDto>().ReverseMap();
             CreateMap<DailyGateIncome, DailyGateIncomeDto>().ReverseMap();
 
+            CreateMap<StockMain, StockMainDto>().ReverseMap();
+            CreateMap<StockHistory, StockHistoryDto>().ReverseMap();
+            CreateMap<BusExpense, BusExpenseDto>().ReverseMap();
+
         }
     }
 }

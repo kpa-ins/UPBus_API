@@ -15,10 +15,10 @@ namespace UPBus_API.Controllers
 
         #region Daily Gate Expense 5-Dec-2024
 
-        [HttpGet]
-        public async Task<IActionResult> GetDailyGateExpenseList()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDailyGateExpenseList(string id)
         {
-            DataTable dt = await _service.GetDailyGateExpenseList();
+            DataTable dt = await _service.GetDailyGateExpenseList(id);
             return Ok(dt);
         }
 
@@ -49,10 +49,10 @@ namespace UPBus_API.Controllers
 
         #region Daily Gate Income 5-Dec-2024
 
-        [HttpGet]
-        public async Task<IActionResult> GetDailyGateIncomeList()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDailyGateIncomeList(string id)
         {
-            DataTable dt = await _service.GetDailyGateIncomeList();
+            DataTable dt = await _service.GetDailyGateIncomeList(id);
             return Ok(dt);
         }
 
@@ -117,6 +117,117 @@ namespace UPBus_API.Controllers
         public async Task<IActionResult> DeleteDailyGateAcc(string gate, DateTime date)
         {
             ResponseMessage msg = await _service.DeleteDailyGateAcc(gate, date);
+            return Ok(msg);
+        }
+
+        #endregion
+
+
+        #region Stock Main 9-Dec-2024
+
+        [HttpGet]
+        public async Task<IActionResult> GetStockMainList()
+        {
+            DataTable dt = await _service.GetStockMainList();
+            return Ok(dt);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetStockMainById(string id)
+        {
+            DataTable dt = await _service.GetStockMainById(id);
+            return Ok(dt);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateStockMain(StockMainDto info)
+        {
+            ResponseMessage msg = await _service.CreateStockMain(info);
+            return Ok(msg);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateStockMain(StockMainDto info)
+        {
+            ResponseMessage msg = await _service.UpdateStockMain(info);
+            return Ok(msg);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStockMain(string id)
+        {
+            ResponseMessage msg = await _service.DeleteStockMain(id);
+            return Ok(msg);
+        }
+
+        #endregion
+
+
+        #region Stock History 9-Dec-2024
+
+        [HttpGet]
+        public async Task<IActionResult> GetStockHistoryList(string id, string stockType, string busNo)
+        {
+            DataTable dt = await _service.GetStockHistoryList(id, stockType, busNo);
+            return Ok(dt);
+        }
+
+         [HttpPost]
+        public async Task<IActionResult> CreateStockHistory(StockHistoryDto info)
+        {
+            ResponseMessage msg = await _service.CreateStockHistory(info);
+            return Ok(msg);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateStockHistory(StockHistoryDto info)
+        {
+            ResponseMessage msg = await _service.UpdateStockHistory(info);
+            return Ok(msg);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> CancelStockHistory(string id)
+        {
+            ResponseMessage msg = await _service.CancelStockHistory(id);
+            return Ok(msg);
+        }
+
+        #endregion
+
+
+
+        #region Bus Expense 10-Dec-2024
+
+        [HttpGet]
+        public async Task<IActionResult> GetBusExpenseList()
+        {
+            DataTable dt = await _service.GetBusExpenseList();
+            return Ok(dt);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBusExpense(BusExpenseDto info)
+        {
+            ResponseMessage msg = await _service.CreateBusExpense(info);
+            return Ok(msg);
+        }
+
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateBusExpense(BusExpenseDto info)
+        {
+            ResponseMessage msg = await _service.UpdateBusExpense(info);
+            return Ok(msg);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBusExpense(string id)
+        {
+            var msg = await _service.DeleteBusExpense(id);
             return Ok(msg);
         }
 

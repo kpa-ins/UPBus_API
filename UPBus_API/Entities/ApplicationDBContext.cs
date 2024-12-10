@@ -46,6 +46,9 @@ namespace UPBus_API
         public DbSet<DailyGateIncome> DailyGateIncome { get; set; }
         public DbSet<DailyPlan> DailyPlan { get; set; }
         public DbSet<DailyGateAcc> DailyGateAcc { get; set; }
+        public DbSet<StockMain> StockMain { get; set; }
+        public DbSet<StockHistory> StockHistory { get; set; }
+        public DbSet<BusExpense> BusExpense { get; set; }
 
     }
 }

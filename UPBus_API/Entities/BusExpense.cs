@@ -1,9 +1,9 @@
-﻿ using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace UPBus_API.Entities
 {
-    public class DailyGateExpense
+    public class BusExpense
     {
         [Key]
         [Column(TypeName = "varchar(15)")]
@@ -12,15 +12,17 @@ namespace UPBus_API.Entities
         public DateTime? ExpDate { get; set; }
         [Column(TypeName = "varchar(6)")]
         public string? ExpCode { get; set; }
-        [Column(TypeName = "varchar(6)")]
-        public string? PaidType { get; set; }
-       
+
+        [Column(TypeName = "varchar(7)")]
+        public string? BusNo { get; set; }
+
         [Column(TypeName = "float")]
-        public float? Amount { get; set; }
-        [Column(TypeName = "varchar(4)")]
-        public string? GateCode { get; set; }
-        [Column(TypeName = "nvarchar(500)")]
-        public string? Description { get; set; }
+        public float? Qty { get; set; }
+        [Column(TypeName = "float")]
+        public float? Price { get; set; }
+        [Column(TypeName = "float")]
+        public float? TotalAmt { get; set; }
+       
         [Column(TypeName = "nvarchar(500)")]
         public string? Remark { get; set; }
 
